@@ -101,6 +101,44 @@ app.get('/login', function(req, res) {
   });
 });
 
+app.post('/login', function(req, res, next) {
+  passport.authenticate('local', function(err, user, info) {
+    if (err) return next(err)
+    if (!user) {
+      return res.redirect('/login')
+    }
+    req.logIn(user, function(err) {
+      if (err) return next(err);
+      return res.redirect('/');
+    });
+  })(req, res, next);
+});
+
+app.get('/signup', function(req, res) {
+  res.render('signup', {
+    user: req.user
+  });
+});
+
+app.post('/signup', function(req, res) {
+  var user = new User({
+      username: req.body.username,
+      email: req.body.email,
+      password: req.body.password
+    });
+
+  user.save(function(err) {
+    req.logIn(user, function(err) {
+      res.redirect('/');
+    });
+  });
+});
+
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
+
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
