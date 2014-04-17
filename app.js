@@ -13,9 +13,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
-
 var userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
@@ -91,8 +88,18 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
-app.use('/users', users);
+app.get('/', function(req, res){
+  res.render('index', {
+    title: 'Express',
+    user: req.user
+  });
+});
+
+app.get('/login', function(req, res) {
+  res.render('login', {
+    user: req.user
+  });
+});
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
